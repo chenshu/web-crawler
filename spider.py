@@ -136,6 +136,10 @@ class Spider(object):
                 # 删除本次需要抓取
                 self.r.zrem('%s_unfetch' % (self.name), url)
                 # print '304\t%s' % (url)
+            elif e.code == 404:
+                # 删除本次需要抓取
+                self.r.zrem('%s_unfetch' % (self.name), url)
+                # print '404\t%s' % (url)
             else:
                 print e, url
         except URLError, e:

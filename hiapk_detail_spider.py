@@ -15,6 +15,13 @@ class HiApkDetailSpider(Spider):
         # 是否是更新抓取
         if self.update == False and self.r.exists('%s_fetched' % (self.name)):
             self.r.rename('%s_fetched' % (self.name), '%s_finished' % (self.name))
+        else:
+            urls = self.r.zrange('%s' % (self.name), 0, -1)
+            scores = [1 for i in range(len(urls))]
+            for i, x in enumerate(urls):
+                scores.insert(i * 2, x)
+            self.r.zadd('%s_unfetch' % (self.name), *scores)
+
         count = 0
         while True:
             count = count + 1
@@ -36,5 +43,5 @@ class HiApkDetailSpider(Spider):
             fp.write(html)
 
 if __name__ == '__main__':
-    spider = HiApkSpider(name = 'hiapk_detail', host = 'apk.hiapk.com', path = '/', timeout = 10, update = True)
+    spider = HiApkDetailSpider(name = 'hiapk_detail', host = 'apk.hiapk.com', path = '/', timeout = 10, update = True)
     spider.start()
