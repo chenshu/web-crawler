@@ -57,12 +57,29 @@ class HiApkPageParser(HTMLParser):
 
     def handle_data(self, data):
         if self.recoding == 1:
-            print '\t%s' % (data.strip().replace('\n', '\t').encode('utf-8')),
+            data = data.strip().replace('\n', '\t')
+            data = data.strip().replace('\r', '\t')
+            if data != '':
+                print '\t%s' % (data.encode('utf-8')),
 
 if __name__ == '__main__':
     pool = redis.ConnectionPool(host='localhost', port=6379, db=1)
     r = redis.Redis(connection_pool=pool)
     parser = HiApkPageParser()
+    '''
+    with codecs.open('static.apk.hiapk.com/html/2012/03/437193.html', 'r', 'utf-8') as fp:
+        data = fp.read()
+        parser.feed(data)
+        print '\n',
+        referer = 'http://static.apk.hiapk.com/html/2012/03/437193.html'
+        if parser.url is not None and parser.url != '':
+            r.set('%s_avatar' % (referer), parser.url)
+        if len(parser.urls) != 0:
+            r.rpush('%s_pic' % (referer), *parser.urls)
+        del parser.urls[:]
+    parser.close()
+    sys.exit()
+    '''
     host = 'static.apk.hiapk.com'
     path = 'html'
     dirname = '%s/%s/%s' % (os.path.dirname(os.path.realpath(__file__)), host, path)

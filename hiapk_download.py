@@ -33,18 +33,18 @@ def download(url, apk_id, host, referer):
         info = response.info()
         content_type = info['Content-Type'] if 'Content-Type' in info else None
         content_length = info['Content-Length'] if 'Content-Length'in info else None
-        if content_type == 'application/vnd.android.package-archive' and content_length > 0:
+        if content_type == 'application/vnd.android.package-archive' and int(content_length) > 0:
             data = response.read()
             if len(data) == int(content_length):
                 return data
             else:
-                print 'error\tsize\t', apk_id
+                print 'error\tsize\t%s\t%s' % (apk_id, referer)
         else:
-            print 'error\ttype\t', apk_id
+            print 'error\ttype\t%s\t%s' % (apk_id, referer)
     except HTTPError, e:
-        print e
+        print 'error\t%s\t%s\t%s' % (e, apk_id, referer)
     except URLError, e:
-        print e
+        print 'error\t%s\t%s\t%s' % (e, apk_id, referer)
     return None
 
 def save(data, apk_id, dirname):
@@ -52,6 +52,11 @@ def save(data, apk_id, dirname):
         fp.write(data)
 
 if __name__ == '__main__':
+    skip = []
+    with open('hiapk_download_error', 'r') as fp:
+        for line in fp:
+            arr = line.strip().split('\t')
+            skip.append(arr[2])
     host = 'static.apk.hiapk.com'
     path = 'html'
     dirname = '%s/%s/%s' % (os.path.dirname(os.path.realpath(__file__)), host, path)
@@ -67,10 +72,10 @@ if __name__ == '__main__':
                 url = 'http://apk.hiapk.com/Download.aspx?aid='
                 referer = 'http://%s/%s/%s/%s/%s' % (host, path, year, month, filename)
                 apk_id = filename.split('.')[0]
+                if apk_id in skip:
+                    continue
                 if os.path.exists('%s/%s' % (dirname_apk, apk_id)):
                     continue
                 data = download(url, apk_id, host, referer)
                 if data is not None:
                     save(data, apk_id, dirname_apk)
-                else:
-                    print 'error\t%s\t%s' % (apk_id, referer)

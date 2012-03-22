@@ -33,7 +33,7 @@ def download(url, apk_id, host, referer):
         info = response.info()
         content_type = info['Content-Type'] if 'Content-Type' in info else None
         content_length = info['Content-Length'] if 'Content-Length'in info else None
-        if content_type == 'application/vnd.android.package-archive' and content_length > 0:
+        if content_type == 'application/vnd.android.package-archive' and int(content_length) > 0:
             data = response.read()
             if len(data) == int(content_length):
                 return data
