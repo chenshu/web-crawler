@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import os
 import gzip
 import redis
 import StringIO
@@ -67,6 +68,7 @@ class Spider(object):
             # 如果已经抓取过
             if self.r.hexists('%s_fetched' % (self.name), url):
                 self.r.zrem('%s_unfetch' % (self.name), url)
+                return
             # 绑定cookie
             self.opener = build_opener(HTTPCookieProcessor(self.cookie))
             # 设置http header
@@ -77,7 +79,7 @@ class Spider(object):
                 ('Accept-Language', 'zh-CN,zh;q=0.8'),
                 ('Connection', 'keep-alive'),
                 ('Host', self.host),
-                ('User-Agent', 'Mozilla/5.0 (Windows NT 5.1) AppleWebKit/535.7 (KHTML, like Gecko) Chrome/16.0.912.63 Safari/535.7')
+                ('User-Agent', 'Mozilla/5.0 (X11; Linux i686) AppleWebKit/535.19 (KHTML, like Gecko) Chrome/18.0.1025.162 Safari/535.19')
             ]
 
             # 如果不是入口url设置Referer
@@ -107,6 +109,14 @@ class Spider(object):
             # 获取页面的编码方式
             vary = info['Vary'] if 'Vary' in info else None
             data = response.read()
+            temp = None
+            try :
+                data = data.decode('utf-8')
+            except UnicodeDecodeError, e:
+                os.popen('wget -q -O /tmp/%s %s' % (self.name, url))
+                temp = '/tmp/%s' % (self.name)
+            if temp is None:
+                data = data.encode('utf-8')
             # gzip解压缩
             if vary is not None and vary == 'Accept-Encoding':
                 s = StringIO.StringIO(data)
@@ -122,7 +132,7 @@ class Spider(object):
                         self.r.zincrby('%s_unfetch' % (self.name), new_url, 1)
             # 是否需要保存数据
             if saveHtml is not None:
-                saveHtml(url, data)
+                saveHtml(url, data, temp)
             # 更新本次已经抓取
             self.r.hset('%s_fetched' % (self.name), url, sj.dumps({'last_modified' : last_modified.strftime(self.GMT_FORMAT), 'expires' : expires.strftime(self.GMT_FORMAT), 'etag' : etag}))
             # 删除本次需要抓取
@@ -151,6 +161,6 @@ class Spider(object):
     def parseUrl(self, url, html):
         raise NotImplementedError
 
-    def saveHtml(self, url, html):
+    def saveHtml(self, url, html, temp=None):
         raise NotImplementedError
 

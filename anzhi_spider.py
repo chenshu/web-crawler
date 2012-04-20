@@ -41,7 +41,7 @@ class AnzhiSpider(Spider):
         urls = ['http://%s/soft_%s.html' % (self.host, path) for path in paths]
         return urls
 
-    def saveHtml(self, url, html):
+    def saveHtml(self, url, html, temp=None):
         paths = re.findall(r'/soft_([0-9]+)\.html', url)
         if paths is not None and len(paths) > 0:
             dirname = '%s/www.anzhi.com' % (os.path.dirname(os.path.realpath(__file__)))

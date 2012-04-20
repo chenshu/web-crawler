@@ -7,6 +7,7 @@ import os.path
 import sys
 import re
 import time
+import shutil
 from spider import Spider
 
 class HiApkDetailSpider(Spider):
@@ -34,13 +35,16 @@ class HiApkDetailSpider(Spider):
                 break
             self.get(tasks[0], None, self.saveHtml)
 
-    def saveHtml(self, url, html):
+    def saveHtml(self, url, html, temp=None):
         path = re.findall(r'http://static.apk.hiapk.com/html/([0-9/]+)\.html', url)[0]
         dirname = '%s/static.apk.hiapk.com/html/%s' % (os.path.dirname(os.path.realpath(__file__)), '/'.join(path.split('/')[0:-1]))
         if not os.path.exists(dirname):
             os.makedirs(dirname)
-        with open('%s/%s.html' % (dirname, path.split('/')[-1]), 'w+') as fp:
-            fp.write(html)
+        if temp is None:
+            with open('%s/%s.html' % (dirname, path.split('/')[-1]), 'w+') as fp:
+                fp.write(html)
+        else:
+            shutil.move(temp, '%s/%s.html' % (dirname, path.split('/')[-1]))
 
 if __name__ == '__main__':
     spider = HiApkDetailSpider(name = 'hiapk_detail', host = 'apk.hiapk.com', path = '/', timeout = 10, update = True)

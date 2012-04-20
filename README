@@ -5,3 +5,14 @@ This is web crawler program
 为了避免死循环抓取，页面分为已经抓取集合
 抓取前判断是否已经存在到已经抓取集合
 获取到的页面有过期时间，页面过期后重新抓取，需要判断是否已经更改(304)
+
+python anzhi_spider.py
+#redis db 2 flushdb
+python anzhi_page_parser.py > anzhi_meta
+python anzhi_download.py
+
+python hiapk_spider.py
+python hiapk_detail_spider.py
+#redis db 1 flushdb
+python hiapk_page_parser.py > hiapk_meta
+python hiapk_download.py

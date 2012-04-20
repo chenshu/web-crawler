@@ -67,11 +67,11 @@ if __name__ == '__main__':
     r = redis.Redis(connection_pool=pool)
     parser = HiApkPageParser()
     '''
-    with codecs.open('static.apk.hiapk.com/html/2012/03/437193.html', 'r', 'utf-8') as fp:
+    with codecs.open('static.apk.hiapk.com/html/2011/03/28310.html', 'r', 'utf-8') as fp:
         data = fp.read()
         parser.feed(data)
         print '\n',
-        referer = 'http://static.apk.hiapk.com/html/2012/03/437193.html'
+        referer = 'http://static.apk.hiapk.com/html/2011/03/28310.html'
         if parser.url is not None and parser.url != '':
             r.set('%s_avatar' % (referer), parser.url)
         if len(parser.urls) != 0:
