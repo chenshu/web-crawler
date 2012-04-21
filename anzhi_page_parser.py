@@ -59,7 +59,7 @@ class AnzhiPageParser(HTMLParser):
             data = data.strip().replace('\n', '\t')
             data = data.strip().replace('\r', '\t')
             if data != '':
-                print '\t%s' % (data.encode('utf-8')),
+                sys.stdout.write('\t%s' % (data.encode('utf-8')))
 
 if __name__ == '__main__':
     pool = redis.ConnectionPool(host='localhost', port=6379, db=2)
@@ -83,7 +83,7 @@ if __name__ == '__main__':
             #print data.encode('utf-8')
             data = parser.unescape(data)
             parser.feed(data)
-            print '\n',
+            sys.stdout.write('\n')
     parser.close()
     sys.exit()
     '''
@@ -93,7 +93,7 @@ if __name__ == '__main__':
     for filename in files:
         apk_id = filename.split('.')[0].split('_')[1]
         referer = 'http://%s/%s' % (host, filename)
-        print '%s\t%s' % (apk_id, referer),
+        sys.stdout.write('%s\t%s' % (apk_id, referer))
         with codecs.open('%s/%s' % (dirname, filename), 'r', 'utf-8') as fp:
             data = fp.read().replace(u'<div id="line1"><input  type="radio" value="5" name="feedbacktype"/ class="other">其他举报理由</div>', '').replace(u'//document.write(\'<script language="javascript" type="text/javascript" src="/user.php?rand=\'+Math.random()+\'"><\/script>\');', '').replace('\\', '')
             regex = re.compile(r'<([A-Za-z0-9/=!\-_" #\.:/;]*[^<>A-Za-z0-9/=!\-_" #\.:/;]+?[A-Za-z0-9/=!\-_" #\.:/;]*)>')
@@ -102,7 +102,7 @@ if __name__ == '__main__':
             data = re.sub(regex, 'name="%s" ' % (urllib.quote('\\1')), data)
             data = parser.unescape(data)
             parser.feed(data)
-            print '\n',
+            sys.stdout.write('\n')
             if parser.url is not None and parser.url != '':
                 r.set('%s_avatar' % (referer), parser.url)
             if len(parser.urls) != 0:

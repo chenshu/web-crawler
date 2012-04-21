@@ -60,22 +60,24 @@ class HiApkPageParser(HTMLParser):
             data = data.strip().replace('\n', '\t')
             data = data.strip().replace('\r', '\t')
             if data != '':
-                print '\t%s' % (data.encode('utf-8')),
+                sys.stdout.write('\t%s' % (data.encode('utf-8')))
 
 if __name__ == '__main__':
     pool = redis.ConnectionPool(host='localhost', port=6379, db=1)
     r = redis.Redis(connection_pool=pool)
     parser = HiApkPageParser()
     '''
-    with codecs.open('static.apk.hiapk.com/html/2011/03/28310.html', 'r', 'utf-8') as fp:
+    with codecs.open('static.apk.hiapk.com/html/2009/09/21.html', 'r', 'utf-8') as fp:
         data = fp.read()
         parser.feed(data)
-        print '\n',
-        referer = 'http://static.apk.hiapk.com/html/2011/03/28310.html'
+        sys.stdout.write('\n')
+        referer = 'http://static.apk.hiapk.com/html/2009/09/21.html'
         if parser.url is not None and parser.url != '':
-            r.set('%s_avatar' % (referer), parser.url)
+            pass
+            #r.set('%s_avatar' % (referer), parser.url)
         if len(parser.urls) != 0:
-            r.rpush('%s_pic' % (referer), *parser.urls)
+            pass
+            #r.rpush('%s_pic' % (referer), *parser.urls)
         del parser.urls[:]
     parser.close()
     sys.exit()
@@ -91,11 +93,11 @@ if __name__ == '__main__':
             for filename in files:
                 apk_id = filename.split('.')[0]
                 referer = 'http://%s/%s/%s/%s/%s' % (host, path, year, month, filename)
-                print '%s\t%s' % (apk_id, referer),
+                sys.stdout.write('%s\t%s' % (apk_id, referer))
                 with codecs.open('%s/%s/%s/%s' % (dirname, year, month, filename), 'r', 'utf-8') as fp:
                     data = fp.read()
                     parser.feed(data)
-                    print '\n',
+                    sys.stdout.write('\n')
                     if parser.url is not None and parser.url != '':
                         r.set('%s_avatar' % (referer), parser.url)
                     if len(parser.urls) != 0:
