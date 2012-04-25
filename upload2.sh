@@ -24,8 +24,46 @@ function upload {
 #    echo $file
 #done
 
-for arg in "$@"
+function split()
+{
+    str=$1
+    sep=$2
+
+    OLD_IFS="$IFS"
+    IFS=$sep
+    arr=($str)
+    IFS="$OLD_IFS"
+    for s in ${arr[@]}
+    do
+        echo "$s" 
+    done
+}
+
+for dir in $1/*
 do
-    echo -ne "$arg\t"
-    upload $arg
+    for file in $dir/*
+    do
+        if [ -f $file ]; then
+            echo -ne "$file\t"
+            #arr=(`split $file "/"`)
+            #num=${#arr[@]}
+            #filename=${arr[$num-1]}
+            #[[ ${filename/./} != ${filename} ]] && echo "yes" || echo "no"
+            #[[ ${filename/./} != ${filename} ]] && echo -ne "$filename\t" || echo -ne "${filename:0:${#filename}-3}.${filename:${#filename}-3}\t"
+            upload $file
+        elif [ -d $file ]; then
+            for f in $file/*
+            do
+                if [ -f $f ]; then
+                    echo -ne "$f\t"
+                    #arr=(`split $f "/"`)
+                    #num=${#arr[@]}
+                    #filename=${arr[$num-1]}
+                    #[[ ${filename/./} != ${filename} ]] && echo "yes" || echo "no"
+                    #[[ ${filename/./} != ${filename} ]] && echo -ne "$filename\t" || echo -ne "${filename:0:${#filename}-3}.${filename:${#filename}-3}\t"
+                    upload $f
+                fi
+            done
+        fi
+    done
 done

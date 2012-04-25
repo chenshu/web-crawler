@@ -51,9 +51,11 @@ if __name__ == '__main__':
                 os.makedirs(dirname)
             for index, pic in enumerate(pics):
                 filename = urlparse.urlparse(pic).path.split('/')[-1]
+                if filename.find('.') == -1:
+                    filename = '%s.%s' % (filename[:len(filename)-3], filename[len(filename) - 3:])
                 if not os.path.exists('%s/%s' % (dirname, filename)):
                     data = get(pic, key.split('_')[0])
-                    if data is not None:
+                    if data is not None and len(data) != 0:
                         open('%s/%s' % (dirname, filename), 'wb+').write(data)
         elif key[-6:] == 'avatar':
             avatar = r.get(key)
@@ -61,7 +63,9 @@ if __name__ == '__main__':
             if not os.path.exists(dirname):
                 os.makedirs(dirname)
             filename = urlparse.urlparse(avatar).path.split('/')[-1]
+            if filename.find('.') == -1:
+                filename = '%s.%s' % (filename[:len(filename)-3], filename[len(filename) - 3:])
             if not os.path.exists('%s/avatar_%s' % (dirname, filename)):
                 data = get(avatar, key.split('_')[0])
-                if data is not None:
+                if data is not None and len(data) != 0:
                     open('%s/avatar_%s' % (dirname, filename), 'wb+').write(data)
