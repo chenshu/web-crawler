@@ -10,9 +10,17 @@ python anzhi_spider.py
 #redis db 2 flushdb
 python anzhi_page_parser.py > anzhi_meta
 python anzhi_download.py
+sh upload.sh www.anzhi.com_apk > anzhi_upload
+python tools.py anzhi
 
 python hiapk_spider.py
 python hiapk_detail_spider.py
 #redis db 1 flushdb
 python hiapk_page_parser.py > hiapk_meta
 python hiapk_download.py
+sh upload.sh static.apk.hiapk.com_apk > hiapk_upload
+python tools.py hiapk
+#find hiapk/ -regextype posix-egrep -regex '[^\.]+' -type f -exec rm -rf {} \;
+python download_pic.py hiapk
+sh upload2.sh /disk2/hiapk > hiapk_pic_upload
+python tools2.py hiapk
